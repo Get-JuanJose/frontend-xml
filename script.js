@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const productoForm = document.getElementById("productoForm");
   const eliminarForm = document.getElementById("eliminarForm");
   const xmlDisplay = document.getElementById("xmlDisplay");
+  const xmlDisplay2 = document.getElementById("xmlDisplay2");
 
   // Función para actualizar la visualización del XML
   function obtenerXML() {
@@ -10,6 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((xml) => {
         agregarSelect(xml);
         xmlDisplay.innerText = xml;
+      })
+      .catch((error) => console.error("Error al obtener XML:", error));
+  }
+
+  function obtenerCargoXML() {
+    fetch("https://backend-xml.onrender.com/cargo")
+      .then((response) => response.text())
+      .then((xml) => {
+        xmlDisplay2.innerText = xml;
       })
       .catch((error) => console.error("Error al obtener XML:", error));
   }
@@ -142,5 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cargar el XML inicialmente
   obtenerXML();
   cargarTabla();
+  obtenerCargoXML()
   // agregarSelect();
 });
