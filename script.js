@@ -79,12 +79,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = document.getElementById("nameEmpleado").value;
     const salary = document.getElementById("salarioEmpleado").value;
     const cargo = document.getElementById("cargoEmpleado").value;
-    
-   
+
     const metodo = id !== 0 ? "PUT" : "POST"; // PUT para actualizar, POST para agregar
-    const endpoint = id !== 0
-      ? `https://backend-xml.onrender.com/${id}`
-      : "https://backend-xml.onrender.com/";
+    const endpoint =
+      id !== 0
+        ? `https://backend-xml.onrender.com/${id}`
+        : "https://backend-xml.onrender.com/";
 
     fetch(endpoint, {
       method: metodo,
@@ -108,7 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const empleadoId = document.getElementById("eliminarId").value;
 
-    fetch(`https://backend-xml.onrender.com/${empleadoId}`, { method: "DELETE" })
+    fetch(`https://backend-xml.onrender.com/${empleadoId}`, {
+      method: "DELETE",
+    })
       .then((response) => response.text())
       .then(() => {
         alert("Empleado eliminado !");
@@ -138,12 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const option1 = document.createElement("option");
-    
+
     option1.textContent = "NUEVO";
     option1.value = 0;
     select.appendChild(option1);
 
     const contenedor = document.getElementById("productoForm");
+
+    const cantidad = document.getElementById("numero");
+    cantidad.append(empleados.length);
 
     // Agregar el <select> al DOM (por ejemplo, dentro de un div con id 'contenedor')
     contenedor.insertBefore(select, contenedor.firstChild.nextSibling);
@@ -152,6 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cargar el XML inicialmente
   obtenerXML();
   cargarTabla();
-  obtenerCargoXML()
+  obtenerCargoXML();
   // agregarSelect();
 });
