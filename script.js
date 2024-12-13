@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Manejar el envío del formulario de producto
   
   productoForm.addEventListener("submit", (e) => {
-     e.preventDefault();
+     //e.preventDefault();
 
     const id = document.getElementById("miSelect").value;
     const name = document.getElementById("nameEmpleado").value;
@@ -129,21 +129,35 @@ document.addEventListener("DOMContentLoaded", () => {
       id != 0
         ? `https://backend-xml.onrender.com/${id}`
         : "https://backend-xml.onrender.com/";
-console.log(endpoint)
+        console.log(endpoint)
+
 
     fetch(endpoint, {
       method: metodo,
-      //headers: {
-      //    'Content-Type': 'application/json',
-      //},
-      body: data,
-    }).then(() => {
-        alert("Empleado Guardado !");
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: data 
+    })
+
+.then((response) => {
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+        }
+        return response.json(); // O response.text() si esperas texto plano
+    })
+    .then((result) => {
+        console.log("Respuesta del servidor:", result);
+        alert("¡Empleado guardado correctamente!");
         obtenerXML(); // Actualiza el XML mostrado
-        productoForm.reset();
-      })
-      .catch((error) => alert(error.message));
-    cargarTabla();
+        productoForm.reset(); // Limpia el formulario
+    })
+    .catch((error) => {
+        console.error("Error al guardar el empleado:", error);
+        alert(`Error: ${error.message}`);
+    });
+
+    cargarTabla(); // Actualiza la tabla si es necesario
   });
 
   // Manejar el formulario de eliminación
