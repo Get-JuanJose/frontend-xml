@@ -5,6 +5,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const xmlDisplay2 = document.getElementById("xmlDisplay2");
 
   // Función para actualizar la visualización del XML
+  
+  function agregarSelect(xml) {
+    const select = document.createElement("select");
+    select.id = "miSelect"; // Puedes establecer un id si lo necesitas
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, "text/xml");
+
+    // Obtener los elementos 'empleado' del XML
+    const empleados = doc.getElementsByTagName("empleado");
+
+    for (let i = 0; i < empleados.length; i++) {
+      empleado = empleados[i];
+      const option = document.createElement("option");
+      option.value = empleado.querySelector("idEmpleado").textContent;
+      option.textContent = empleado.querySelector("idEmpleado").textContent;
+      select.appendChild(option);
+    }
+
+    const option1 = document.createElement("option");
+
+    option1.textContent = "NUEVO";
+    option1.value = 0;
+    select.appendChild(option1);
+
+    const contenedor = document.getElementById("productoForm");
+
+    const cantidad = document.getElementById("numero");
+    cantidad.append(empleados.length);
+
+    // Agregar el <select> al DOM (por ejemplo, dentro de un div con id 'contenedor')
+    contenedor.insertBefore(select, contenedor.firstChild.nextSibling);
+  }
   function obtenerXML() {
     fetch("https://backend-xml.onrender.com/")
       .then((response) => response.text())
@@ -15,7 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => console.error("Error al obtener XML:", error));
   }
 
-  function obtenerCargoXML() {
+  // Funcion para Obtener el arbol  XML
+  function obtenerCargoXML() { 
     fetch("https://backend-xml.onrender.com/cargo")
       .then((response) => response.text())
       .then((xml) => {
@@ -24,6 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => console.error("Error al obtener XML:", error));
   }
 
+
+// Cargador de la tabla 
   function crearFila(empleado) {
     const fila = tablaEmpleados.insertRow();
 
@@ -72,33 +108,41 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Manejar el envío del formulario de producto
+  
   productoForm.addEventListener("submit", (e) => {
-    // e.preventDefault();
+     e.preventDefault();
 
     const id = document.getElementById("miSelect").value;
     const name = document.getElementById("nameEmpleado").value;
     const salary = document.getElementById("salarioEmpleado").value;
     const cargo = document.getElementById("cargoEmpleado").value;
 
-    const metodo = id !== 0 ? "PUT" : "POST"; // PUT para actualizar, POST para agregar
+    const data = JSON.stringify({ id: parseInt(id), name, salary: parseInt(salary), cargo })
+
+    alert(data)
+    //alert(id)
+    //alert(name)
+    //alert(salary)
+    //alert(cargo)
+    const metodo = id != 0 ? "PUT" : "POST"; // PUT para actualizar, POST para agregar
     const endpoint =
-      id !== 0
+      id != 0
         ? `https://backend-xml.onrender.com/${id}`
         : "https://backend-xml.onrender.com/";
+console.log(endpoint)
 
     fetch(endpoint, {
       method: metodo,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id, name, salary, cargo }),
-    })
-      .then(() => {
+      //headers: {
+      //    'Content-Type': 'application/json',
+      //},
+      body: data,
+    }).then(() => {
         alert("Empleado Guardado !");
         obtenerXML(); // Actualiza el XML mostrado
         productoForm.reset();
       })
-      .catch((error) => console.error("Error al guardar producto:", error));
+      .catch((error) => alert(error.message));
     cargarTabla();
   });
 
@@ -118,41 +162,11 @@ document.addEventListener("DOMContentLoaded", () => {
         obtenerXML(); // Actualiza el XML mostrado
         eliminarForm.reset();
       })
-      .catch((error) => console.error("Error al eliminar producto:", error));
+      .catch((error) => alert("Error al eliminar producto:"  + error));
   });
 
-  function agregarSelect(xml) {
-    const select = document.createElement("select");
-    select.id = "miSelect"; // Puedes establecer un id si lo necesitas
+  
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, "text/xml");
-
-    // Obtener los elementos 'empleado' del XML
-    const empleados = doc.getElementsByTagName("empleado");
-
-    for (let i = 0; i < empleados.length; i++) {
-      empleado = empleados[i];
-      const option = document.createElement("option");
-      option.value = empleado.querySelector("idEmpleado").textContent;
-      option.textContent = empleado.querySelector("idEmpleado").textContent;
-      select.appendChild(option);
-    }
-
-    const option1 = document.createElement("option");
-
-    option1.textContent = "NUEVO";
-    option1.value = 0;
-    select.appendChild(option1);
-
-    const contenedor = document.getElementById("productoForm");
-
-    const cantidad = document.getElementById("numero");
-    cantidad.append(empleados.length);
-
-    // Agregar el <select> al DOM (por ejemplo, dentro de un div con id 'contenedor')
-    contenedor.insertBefore(select, contenedor.firstChild.nextSibling);
-  }
 
   // Cargar el XML inicialmente
   obtenerXML();
