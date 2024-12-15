@@ -3,10 +3,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const eliminarForm = document.getElementById("eliminarForm");
   const xmlDisplay = document.getElementById("xmlDisplay");
   const xmlDisplay2 = document.getElementById("xmlDisplay2");
+  // Cargar el XML inicialmente
+  obtenerXML();
+  cargarTabla();
+  obtenerCargoXML();
+  // agregarSelect();
+});
 
   // Función para actualizar la visualización del XML
   
   function agregarSelect(xml) {
+  // Buscar si el <select> ya existe en el DOM
+  const selectExistente = document.getElementById("miSelect");
+  if (selectExistente) {
+    selectExistente.remove(); // Eliminar el <select> existente
+  }
     const select = document.createElement("select");
     select.id = "miSelect"; // Puedes establecer un id si lo necesitas
 
@@ -32,14 +43,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const contenedor = document.getElementById("productoForm");
 
-    const cantidad = document.getElementById("numero");
-    cantidad.append(empleados.length);
 
-    // Agregar el <select> al DOM (por ejemplo, dentro de un div con id 'contenedor')
-    contenedor.insertBefore(select, contenedor.firstChild.nextSibling);
+    //const cantidad = document.getElementById("numero");
+    //cantidad.append(empleados.length);
+  // Actualizar la cantidad de empleados
+  const cantidad = document.getElementById("numero");
+  if (cantidad) {
+    cantidad.textContent = empleados.length; // Actualizar el número de empleados
   }
+    // Agregar el <select> al DOM (por ejemplo, dentro de un div con id 'contenedor')
+
+    contenedor.insertBefore(select, contenedor.firstChild.nextSibling);
+
+  }
+
   function obtenerXML() {
-    fetch("https://backend-xml.onrender.com/")
+    fetch("https://backend-xml.onrender.com")
       .then((response) => response.text())
       .then((xml) => {
         agregarSelect(xml);
@@ -50,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Funcion para Obtener el arbol  XML
   function obtenerCargoXML() { 
-    fetch("https://backend-xml.onrender.com/cargo")
+    fetch("https://backend-xml.onrender.com")
       .then((response) => response.text())
       .then((xml) => {
         xmlDisplay2.innerText = xml;
@@ -70,47 +89,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const celdaBoton = fila.insertCell();
   }
 
-  function cargarTabla() {
-    fetch("https://backend-xml.onrender.com/")
-      .then((response) => response.text())
-      .then((xml) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xml, "text/xml");
 
-        // Obtener los elementos 'empleado' del XML
-        const empleados = doc.getElementsByTagName("empleado");
+function cargarTabla() {
+  fetch("https://backend-xml.onrender.com")
+    .then((response) => response.text())
+    .then((xml) => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(xml, "text/xml");
 
-        // Crear la tabla y los encabezados
-        const tabla = document.createElement("table");
-        const encabezado = tabla.createTHead();
-        const filaEncabezado = encabezado.insertRow();
-        ["ID", "Nombre", "Salario", "Cargo"].forEach((encabezado) => {
-          const celda = document.createElement("th");
-          celda.textContent = encabezado;
-          filaEncabezado.appendChild(celda);
-        });
+      // Obtener los elementos 'empleado' del XML
+      const empleados = doc.getElementsByTagName("empleado");
 
-        // Crear las filas de datos
-        for (let i = 0; i < empleados.length; i++) {
-          const empleado = empleados[i];
-          const id = empleado.querySelector("idEmpleado").textContent;
-          const nombre = empleado.querySelector("nameEmpleado").textContent;
-          const salario = empleado.querySelector("salarioEmpleado").textContent;
-          const cargo = empleado.querySelector("cargoEmpleado").textContent;
-          crearFila({ id, nombre, salario, cargo });
-        }
+      // Referencia al contenedor de la tabla
+      const tablaEmpleados = document.getElementById("tabla-empleados");
 
-        // Agregar la tabla al DOM
-        const tablaEmpleados = document.getElementById("tabla-empleados");
-        // tablaEmpleados.appendChild(tabla);
-      })
-      .catch((error) => console.error("Error al obtener XML:", error));
-  }
+      // Limpiar el contenido actual de la tabla
+      tablaEmpleados.innerHTML = '';
+
+      // Crear la tabla y los encabezados
+      const tabla = document.createElement("table");
+
+tabla.classList.add("table", "table-striped", "table-bordered", "table-hover");
+      const encabezado = tabla.createTHead();
+      const filaEncabezado = encabezado.insertRow();
+      ["ID", "Nombre", "Salario", "Cargo"].forEach((encabezado) => {
+        const celda = document.createElement("th");
+        celda.textContent = encabezado;
+        filaEncabezado.appendChild(celda);
+      });
+
+      // Crear las filas de datos
+      const cuerpoTabla = tabla.createTBody();
+      for (let i = 0; i < empleados.length; i++) {
+        const empleado = empleados[i];
+        const fila = cuerpoTabla.insertRow();
+        
+        const id = empleado.querySelector("idEmpleado").textContent;
+        const nombre = empleado.querySelector("nameEmpleado").textContent;
+        const salario = empleado.querySelector("salarioEmpleado").textContent;
+        const cargo = empleado.querySelector("cargoEmpleado").textContent;
+
+        fila.insertCell().textContent = id;
+        fila.insertCell().textContent = nombre;
+        fila.insertCell().textContent = salario;
+        fila.insertCell().textContent = cargo;
+      }
+
+      // Agregar la tabla actualizada al contenedor
+      tablaEmpleados.appendChild(tabla);
+    })
+    .catch((error) => console.error("Error al obtener XML:", error));
+}
+
+
 
   // Manejar el envío del formulario de producto
   
   productoForm.addEventListener("submit", (e) => {
-     //e.preventDefault();
+     e.preventDefault();
 
     const id = document.getElementById("miSelect").value;
     const name = document.getElementById("nameEmpleado").value;
@@ -119,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = JSON.stringify({ id: parseInt(id), name, salary: parseInt(salary), cargo })
 
-    alert(data)
+    //alert(data)
     //alert(id)
     //alert(name)
     //alert(salary)
@@ -127,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const metodo = id != 0 ? "PUT" : "POST"; // PUT para actualizar, POST para agregar
     const endpoint =
       id != 0
-        ? `https://backend-xml.onrender.com/${id}`
+        ? `https://backend-xml.onrender.com/{id}`
         : "https://backend-xml.onrender.com/";
         console.log(endpoint)
 
@@ -140,29 +176,30 @@ document.addEventListener("DOMContentLoaded", () => {
       body: data 
     })
 
-.then((response) => {
+    .then((response) => {
         if (!response.ok) {
             throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
         }
-        return response.json(); // O response.text() si esperas texto plano
+        //return response.json(); // O response.text() si esperas texto plano
     })
-    .then((result) => {
-        console.log("Respuesta del servidor:", result);
+    .then(() => {
         alert("¡Empleado guardado correctamente!");
         obtenerXML(); // Actualiza el XML mostrado
+        obtenerCargoXML();
+        cargarTabla();
         productoForm.reset(); // Limpia el formulario
     })
-    .catch((error) => {
-        console.error("Error al guardar el empleado:", error);
-        alert(`Error: ${error.message}`);
-    });
+    //.catch((error) => 
+    //    //console.error("Error al guardar el empleado:" + error);
+    //    alert(`Error: ${error.message}`);
+    //});
 
-    cargarTabla(); // Actualiza la tabla si es necesario
+    //cargarTabla(); // Actualiza la tabla si es necesario
   });
 
   // Manejar el formulario de eliminación
   eliminarForm.addEventListener("submit", (e) => {
-    // e.preventDefault();
+     e.preventDefault();
 
     const empleadoId = document.getElementById("eliminarId").value;
 
@@ -174,6 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Empleado eliminado !");
 
         obtenerXML(); // Actualiza el XML mostrado
+        obtenerCargoXML();
+        cargarTabla();
         eliminarForm.reset();
       })
       .catch((error) => alert("Error al eliminar producto:"  + error));
@@ -182,9 +221,4 @@ document.addEventListener("DOMContentLoaded", () => {
   
 
 
-  // Cargar el XML inicialmente
-  obtenerXML();
-  cargarTabla();
-  obtenerCargoXML();
-  // agregarSelect();
-});
+
