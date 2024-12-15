@@ -163,7 +163,7 @@ tabla.classList.add("table", "table-striped", "table-bordered", "table-hover");
     const metodo = id != 0 ? "PUT" : "POST"; // PUT para actualizar, POST para agregar
     const endpoint =
       id != 0
-        ? `https://backend-xml.onrender.com/{id}`
+        ? `https://backend-xml.onrender.com/${id}`
         : "https://backend-xml.onrender.com/";
         console.log(endpoint)
 
